@@ -1,20 +1,57 @@
-import { useCallback, useState } from "react";
-import Info from "../components/Info";
+import { useState, useEffect } from 'react';
 
-export default function Home() {
-  const [count, setCount] = useState(100);
-  const cAdd = useCallback(() => {
-    setCount(count=>count+1);
-  },[])
-  
-  // const cAdd = () => {
-  //   setCount(count=>count+1);
-  // }
-  
+function createConnection(serverUrl, roomId) {
+  // A real implementation would actually connect to the server
+  return {
+    connect() {
+      console.log('✅ Connecting to "' + roomId + '" room at ' + serverUrl + '...');
+    },
+    disconnect() {
+      console.log('❌ Disconnected from "' + roomId + '" room at ' + serverUrl);
+    }
+  };
+}
+
+function ChatRoom({ roomId }) { // roomId is reactive
+  const [serverUrl, setServerUrl] = useState('https://localhost:1234'); // serverUrl is reactive
+
+  useEffect(() => {
+    const connection = createConnection(serverUrl, roomId);
+    connection.connect();
+    return () => connection.disconnect();
+  }, [serverUrl, roomId]); // <-- Something's wrong here!
+
   return (
-    <div>
-      <h1>Home {count}</h1>
-      <Info name="张三" cAdd={cAdd}/>
-    </div>
+    <>
+      <label>
+        Server URL:{' '}
+        <input
+          value={serverUrl}
+          onChange={e => setServerUrl(e.target.value)}
+        />
+      </label>
+      <h1>Welcome to the {roomId} {serverUrl} room!</h1>
+    </>
+  );
+}
+
+export default function App() {
+  const [roomId, setRoomId] = useState('general');
+  return (
+    <>
+      <label>
+        Choose the chat room:{' '}
+        <select
+          value={roomId}
+          onChange={e => setRoomId(e.target.value)}
+        >
+          <option value="general">general</option>
+          <option value="travel">travel</option>
+          <option value="music">music</option>
+        </select>
+      </label>
+      <hr />
+      <ChatRoom roomId={roomId} />
+    </>
   );
 }
