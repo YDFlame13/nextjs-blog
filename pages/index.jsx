@@ -1,57 +1,38 @@
-import { useState, useEffect } from 'react';
+import Link from "next/link";
 
-function createConnection(serverUrl, roomId) {
-  // A real implementation would actually connect to the server
-  return {
-    connect() {
-      console.log('✅ Connecting to "' + roomId + '" room at ' + serverUrl + '...');
-    },
-    disconnect() {
-      console.log('❌ Disconnected from "' + roomId + '" room at ' + serverUrl);
+import menu from "../constant/menu";
+// import { getMenu } from "../lib/menu";
+
+// export async function getStaticProps() {
+//   const menu = getMenu();
+//   return {
+//     props: {
+//       menu
+//     }
+//   }
+// }
+
+export default function Home(){
+  const renderMenu = (menu, level) => {
+    const TAB = 20;
+    const style = {
+      marginLeft: (TAB*level).toString() + 'px',
     }
-  };
-}
-
-function ChatRoom({ roomId }) { // roomId is reactive
-  const [serverUrl, setServerUrl] = useState('https://localhost:1234'); // serverUrl is reactive
-
-  useEffect(() => {
-    const connection = createConnection(serverUrl, roomId);
-    connection.connect();
-    return () => connection.disconnect();
-  }, [serverUrl, roomId]); // <-- Something's wrong here!
-
+    return (
+      <>
+        {menu.map(item=>(
+          <div key={item.id}>
+            <Link href={item.to} style={style}>{item.text}</Link>
+            {item.children&&renderMenu(item.children, level+1)}
+          </div>
+        ))}
+      </>
+    )
+  }
+  
   return (
     <>
-      <label>
-        Server URL:{' '}
-        <input
-          value={serverUrl}
-          onChange={e => setServerUrl(e.target.value)}
-        />
-      </label>
-      <h1>Welcome to the {roomId} {serverUrl} room!</h1>
+      {renderMenu(menu,0)}
     </>
-  );
-}
-
-export default function App() {
-  const [roomId, setRoomId] = useState('general');
-  return (
-    <>
-      <label>
-        Choose the chat room:{' '}
-        <select
-          value={roomId}
-          onChange={e => setRoomId(e.target.value)}
-        >
-          <option value="general">general</option>
-          <option value="travel">travel</option>
-          <option value="music">music</option>
-        </select>
-      </label>
-      <hr />
-      <ChatRoom roomId={roomId} />
-    </>
-  );
+  )
 }

@@ -1,0 +1,23 @@
+.tasks {
+  width: 400px;
+  list-style-type: none;
+  .task {
+    width: 100%;
+    height: 34px;
+    input {
+      margin-right: 10px;
+      margin-top: 5px;
+      float: left;
+    }
+    .tt {
+      float: left;
+      line-height: 32px;
+    }
+    .done {
+      text-decoration: line-through;
+    }
+    .td-btn {
+      float: right;
+    }
+  }
+}
